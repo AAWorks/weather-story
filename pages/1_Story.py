@@ -5,6 +5,7 @@ from charts.charts import (
     base_theme,
     chart_hook_temp_over_time,
     chart_context_seasonality,
+    chart_year_month_heatmap,
     chart_surprise_extremes,
     chart_explain_precip_vs_temp,
 )
@@ -29,12 +30,17 @@ st.write("Next, we summarize the temperature info in a way that makes month-to-m
 st.altair_chart(chart_context_seasonality(df), use_container_width=True)
 st.caption("Takeaway: As expected, summer months shift the distribution upward; winter months have lower medians and tighter ranges.")
 
-st.header("3) Surprise: Extremely hot days")
+st.header("3) Year × month heatmap")
+st.write("(Added static plot) A compact view of average max temperature by month and year highlights shifts and anomalies across seasons.")
+st.altair_chart(chart_year_month_heatmap(df), use_container_width=True)
+st.caption("Takeaway: Seasonality is consistent, but some years show warmer or cooler stretches in particular months.")
+
+st.header("4) Surprise: Extremely hot days")
 st.write("Here we highlight rare events of extreme heat, not just the average, defined by temperatures in the 99-th percentile.")
 st.altair_chart(chart_surprise_extremes(df), use_container_width=True)
 st.caption("Takeaway: A small fraction of days drive the highest peaks—outliers that a smoothed trend can hide.")
 
-st.header("4) Precipitation vs temperature")
+st.header("5) Precipitation vs temperature")
 st.write("We wish to test a plausible explanation: are the warmest days also the driest (or not)?")
 st.altair_chart(chart_explain_precip_vs_temp(df), use_container_width=True)
 st.caption("Takeaway: The relationship is noisy — precipitation alone does not explain extreme heat, motivating more fine-grained exploration.")

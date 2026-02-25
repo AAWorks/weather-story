@@ -70,6 +70,62 @@ def chart_explain_precip_vs_temp(df: pd.DataFrame) -> alt.Chart:
         .properties(height=320)
     )
 
+def chart_year_month_heatmap(df: pd.DataFrame) -> alt.Chart:
+    return (
+        alt.Chart(df)
+        .mark_rect()
+        .encode(
+            x=alt.X("month_name:N", title="Month", sort=[
+                "Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"
+            ]),
+            y=alt.Y("year:O", title="Year"),
+            color=alt.Color("mean(temp_max):Q", title="Avg max temp (°C)"),
+            tooltip=[
+                alt.Tooltip("year:O", title="Year"),
+                alt.Tooltip("month_name:N", title="Month"),
+                alt.Tooltip("mean(temp_max):Q", title="Avg max temp (°C)", format=".1f"),
+            ],
+        )
+        .properties(height=320)
+    )
+
+def chart_calendar_heatmap(df: pd.DataFrame) -> alt.Chart:
+    df2 = df.copy()
+    df2["dayofyear"] = df2["date"].dt.dayofyear
+    df2["temp_range"] = df2["temp_max"] - df2["temp_min"]
+
+    metrics = ["temp_max", "temp_min", "precipitation", "wind", "temp_range"]
+    df_long = df2.melt(
+        id_vars=["date", "year", "dayofyear"],
+        value_vars=metrics,
+        var_name="metric",
+        value_name="value",
+    )
+
+    metric_select = alt.selection_point(
+        fields=["metric"],
+        bind=alt.binding_select(options=metrics, name="Metric: "),
+        value=[{"metric": "temp_max"}],
+    )
+
+    return (
+        alt.Chart(df_long)
+        .mark_rect()
+        .encode(
+            x=alt.X("dayofyear:Q", title="Day of year"),
+            y=alt.Y("year:O", title="Year"),
+            color=alt.Color("value:Q", title="Value"),
+            tooltip=[
+                alt.Tooltip("date:T", title="Date"),
+                alt.Tooltip("metric:N", title="Metric"),
+                alt.Tooltip("value:Q", title="Value", format=".2f"),
+            ],
+        )
+        .add_params(metric_select)
+        .transform_filter(metric_select)
+        .properties(height=320)
+    )
+
 def chart_dashboard(df: pd.DataFrame) -> alt.Chart:
     weather_types = sorted(df["weather"].unique())
 

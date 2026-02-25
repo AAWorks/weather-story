@@ -112,9 +112,10 @@ def chart_calendar_heatmap(df: pd.DataFrame) -> alt.Chart:
         alt.Chart(df_long)
         .mark_rect()
         .encode(
-            x=alt.X("dayofyear:Q", title="Day of year"),
+            x=alt.X("dayofyear:O", title="Day of year", sort="ascending"),
             y=alt.Y("year:O", title="Year"),
             color=alt.Color("value:Q", title="Value"),
+            detail="date:T",
             tooltip=[
                 alt.Tooltip("date:T", title="Date"),
                 alt.Tooltip("metric:N", title="Metric"),
